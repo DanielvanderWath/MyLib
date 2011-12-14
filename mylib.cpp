@@ -1,6 +1,4 @@
 #include "mylib.h"
-#define GLERR(X) CheckGLError(X, __LINE__, __FILE__)
-#define SDLERR(X) SDLErrorAndDie(X, __LINE__, __FILE__)
 
 void clamp3i(int lower, int *arr3f, int higher)
 {//clamp each value in a 1x3 array
@@ -71,7 +69,7 @@ bool checkShaderCompileStatus(GLuint shader)
 	int status;
 	
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-		if(GLERR("glGetShaderiv shader compile status")) return false;
+		GLERR("glGetShaderiv shader compile status");
 
 	if(status==GL_FALSE)
 	{
@@ -79,13 +77,13 @@ bool checkShaderCompileStatus(GLuint shader)
 		char *log=NULL;
 		
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &loglength);
-			if(GLERR("glGetShaderiv GL_INFO_LOG_LENGTH")) return false;
+			GLERR("glGetShaderiv GL_INFO_LOG_LENGTH");
 		
 		log=(char*)malloc(sizeof(char)*loglength);
 		if(log)
 		{
 			glGetShaderInfoLog(shader, loglength, NULL, log);
-				if(GLERR("glGetShaderInfoLog")) return false;
+				GLERR("glGetShaderInfoLog");
 			printf("shader failed to compile: %s", log);
 			free(log);
 		}
@@ -101,7 +99,7 @@ int checkProgramLinkStatus(GLuint program)
 	{
 		GLint status;
 		glGetProgramiv(program, GL_LINK_STATUS, &status);
-			if(GLERR("glGetProgramiv")) return 1;
+			GLERR("glGetProgramiv");
 
 		if(status==GL_FALSE)
 		{
@@ -109,13 +107,13 @@ int checkProgramLinkStatus(GLuint program)
 			char *log=NULL;	
 			printf("Program linking failed\n");
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &loglength);
-				if(GLERR("glGetProgramiv loglength")) return 1;
+				GLERR("glGetProgramiv loglength");
 
 			log=(char*)malloc(sizeof(char)*loglength);
 			if(log)
 			{
 				glGetProgramInfoLog(program, loglength, NULL, log);
-					if(GLERR("glGetProgramInfoLog")) return 1;
+					GLERR("glGetProgramInfoLog");
 
 				printf("program info log:%s\n", log);
 
@@ -158,13 +156,13 @@ int loadShaderFromFile(const char* filename, GLuint *shader, GLuint shaderType)
 			printf("couldn't find %s shader file: %s", shaderType==GL_VERTEX_SHADER ? "vertex" : "fragment", filename);
 		}
 		*shader= glCreateShader(shaderType);
-			if(GLERR("glCreateShader")) return 1;
+			GLERR("glCreateShader");
 		
 		glShaderSource(*shader, 1, (const GLchar**)&source, NULL);
-			if(GLERR("glShaderSource")) return 1;
+			GLERR("glShaderSource");
 
 		glCompileShader(*shader);
-			if(GLERR("glCompilerShader")) return 1; 
+			GLERR("glCompilerShader"); 
 		checkShaderCompileStatus(*shader);
 		free(source);
 	}		
@@ -177,21 +175,21 @@ int createProgramWith2Shaders(GLuint *program, GLuint *vert, GLuint *frag)
 {
 	//program
 	*program=glCreateProgram();
-		if(GLERR("glCreateProgram")) return 1;
+		GLERR("glCreateProgram");
 
 	glAttachShader(*program, *vert);
-		if(GLERR("glAttachShader(vertex)")) return 1;
+		GLERR("glAttachShader(vertex)");
 
 	glAttachShader(*program, *frag);
-		if(GLERR("glAttachShader(fragment)")) return 1;
+		GLERR("glAttachShader(fragment)");
 
 	//link and check for errors
 	glLinkProgram(*program);
-		if(GLERR("glLinkProgram")) return 1;
+		GLERR("glLinkProgram");
 	if(checkProgramLinkStatus(*program)) {printf("program failed to link\n"); return 1;}
 		
 	glUseProgram(*program);
-		if(GLERR("glUseProgram")) return 1;
+		GLERR("glUseProgram");
 
 	return 0;
 }

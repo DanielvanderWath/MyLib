@@ -11,6 +11,10 @@
 
 #include "errorcheck.h"
 
+#define GLERR(X) if(CheckGLError(X, __LINE__, __FILE__))return 1;
+#define SDLERR(X) SDLErrorAndDie(X, __LINE__, __FILE__)
+
+
 #define fori0to3 for(int i=0; i<3; i++)
 const float PI=3.14159265f;
 #define RADS(x) ((x*PI/180.0f)) //convert degrees to radians
